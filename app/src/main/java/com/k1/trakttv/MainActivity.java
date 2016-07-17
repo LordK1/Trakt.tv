@@ -16,15 +16,24 @@ import com.k1.trakttv.model.Movie;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * To load list of {@link Movie} from the Api
+ *
+ * Created by K1 on 7/17/16.
+ */
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+
+    @Inject
+    ApiService service;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        ((MainApplication) getApplication()).getAppComponent().inject(this);
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -42,31 +54,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.trakt.tv")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        final ApiService apiService = retrofit.create(ApiService.class);
-        apiService.getPopularMovies(0,30).enqueue(new Callback<List<Movie>>() {
-
-            @Override
-            public void onResponse(Call<List<Movie>> call, Response<List<Movie>> response) {
-                Log.d(TAG, "onResponse() called with: " + "call = [" + call + "], response = [" + response + "] "
-                        + " CODE :  " + response.code()
-                        + " Message : " + response.message()
-                );
-                if (response.isSuccessful()) {
-                    Log.i(TAG, "BODY : " + response.body());
-                    Toast.makeText(MainActivity.this, String.valueOf(response.body()), Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Movie>> call, Throwable t) {
-                Log.d(TAG, "onFailure() called with: " + "call = [" + call + "], t = [" + t + "]");
-                t.printStackTrace();
-            }
-        });
+        service.getPopularMovies(0,30).enqueue(new GetMoviesCallback());
 
     }
 
@@ -90,5 +78,26 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private class GetMoviesCallback implements Callback<List<Movie>> {
+
+        @Override
+        public void onResponse(Call<List<Movie>> call, Response<List<Movie>> response) {
+            Log.d(TAG, "onResponse() called with: " + "call = [" + call + "], response = [" + response + "] "
+                    + " CODE :  " + response.code()
+                    + " Message : " + response.message()
+            );
+            if (response.isSuccessful()) {
+                Log.i(TAG, "BODY : " + response.body());
+                Toast.makeText(MainActivity.this, String.valueOf(response.body()), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onFailure(Call<List<Movie>> call, Throwable t) {
+            Log.d(TAG, "onFailure() called with: " + "call = [" + call + "], t = [" + t + "]");
+            t.printStackTrace();
+        }
     }
 }
