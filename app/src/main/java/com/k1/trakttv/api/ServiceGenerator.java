@@ -2,6 +2,7 @@ package com.k1.trakttv.api;
 
 import java.io.IOException;
 
+import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -24,13 +25,16 @@ public final class ServiceGenerator {
             @Override
             public Response intercept(Chain chain) throws IOException {
                 final Request original = chain.request();
-                final Request.Builder builder = original.newBuilder();
-                builder.addHeader("Accept", "application/json")
+                final HttpUrl.Builder urlBuilder = original.url().newBuilder().addQueryParameter("extended","full,images");
+                final Request.Builder requestBuilder = original.newBuilder();
+                requestBuilder
+                        .url(urlBuilder.build())
+                        .addHeader("Accept", "application/json")
                         .addHeader("trakt-api-version", "2")
                         .addHeader("trakt-api-key", "ad005b8c117cdeee58a1bdb7089ea31386cd489b21e14b19818c91511f12a086")
                         .method(original.method(), original.body());
 
-                return chain.proceed(builder.build());
+                return chain.proceed(requestBuilder.build());
             }
         }).build();
         final Retrofit retrofit = mRetrofitBuilder.client(build).baseUrl(BASE_URL).build();

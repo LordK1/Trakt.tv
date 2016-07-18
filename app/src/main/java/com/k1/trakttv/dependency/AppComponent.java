@@ -1,8 +1,7 @@
 package com.k1.trakttv.dependency;
 
-import android.app.Activity;
-
 import com.k1.trakttv.MainActivity;
+import com.k1.trakttv.MainActivityFragment;
 
 import dagger.Component;
 
@@ -16,9 +15,16 @@ import dagger.Component;
 public interface AppComponent {
 
     /**
-     * To {@link javax.inject.Inject} {@link AppModule} into extended {@link Activity} classes
+     * To {@link javax.inject.Inject} {@link AppModule} into extended {@link MainActivity}
      *
      * @param mainActivity
      */
     void inject(MainActivity mainActivity);
+
+    /**
+     * To {@link javax.inject.Inject} {@link AppModule} into extended {@link MainActivityFragment}
+     *
+     * @param fragment
+     */
+    void inject(MainActivityFragment fragment);
 }

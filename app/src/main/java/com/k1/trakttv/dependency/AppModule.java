@@ -2,12 +2,15 @@ package com.k1.trakttv.dependency;
 
 import android.app.Application;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.k1.trakttv.api.ApiService;
 
 import java.io.IOException;
 
 import dagger.Module;
 import dagger.Provides;
+import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -22,8 +25,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class AppModule {
 
     private static final String BASE_URL = "https://api.trakt.tv";
+    private static final String DATA_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     private final Retrofit retrofit;
     private final OkHttpClient client;
+    private final Gson gson;
     private Application application;
 
     public AppModule(Application application) {
@@ -33,13 +38,12 @@ public class AppModule {
                 .addInterceptor(new CustomInterceptor())
                 .build();
 
+        gson = new GsonBuilder().setDateFormat(DATA_FORMAT).create();
         retrofit = new Retrofit.Builder()
                 .client(client)
                 .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
-
-
     }
 
     @ApplicationScope // using the previously defined scope, note that @Singleton will not work
@@ -54,6 +58,12 @@ public class AppModule {
         return client;
     }
 
+    @ApplicationScope
+    @Provides
+    public Gson provideGson() {
+        return gson;
+    }
+
     /**
      * To Add Customized {@link retrofit2.http.Header} into {@link Request}
      * and then added inot {@link OkHttpClient}
@@ -62,12 +72,19 @@ public class AppModule {
         @Override
         public Response intercept(Chain chain) throws IOException {
             final Request original = chain.request();
-            original.newBuilder()
+            final Request.Builder builder = original.newBuilder();
+            final HttpUrl queryUrl = original.url().newBuilder()
+                    .addQueryParameter("extended", "full,images")
+                    .build();
+            builder
+                    .url(queryUrl)
                     .addHeader("Accept", "application/json")
                     .addHeader("trakt-api-version", "2")
                     .addHeader("trakt-api-key", "ad005b8c117cdeee58a1bdb7089ea31386cd489b21e14b19818c91511f12a086")
-                    .method(original.method(), original.body()).build();
-            return chain.proceed(original);
+                    .method(original.method(), original.body())
+                    .build();
+
+            return chain.proceed(builder.build());
         }
     }
 

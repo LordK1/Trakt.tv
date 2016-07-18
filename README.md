@@ -19,6 +19,6 @@ This project contains case study challenge for Software Engineer (Android) in tr
 - [AppCompat]
 
 ##Demonstration:
-In this simple sample I just try to use moset up to dated technology in android developmet,
-As Android developer you alwase must be aware of what's going on, some convictional solutions
+In this simple sample I just try to use most up to dated technologies, third parties and libraries in android development,
+As as Android developer you always must be aware of what's going on, some momentary solutions
 cause some big issues in the future.
