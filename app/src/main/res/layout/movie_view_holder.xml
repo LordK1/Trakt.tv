@@ -21,7 +21,8 @@
         <android.support.v7.widget.ContentFrameLayout
             android:id="@+id/movie_thumbnail_container"
             android:layout_width="match_parent"
-            android:layout_height="275dp">
+            android:layout_height="275dp"
+            android:animateLayoutChanges="true">
 
 
             <ImageView

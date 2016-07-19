@@ -60,7 +60,7 @@ public class MainActivityFragment extends Fragment implements OnLoadMoreScrollLi
 //        Log.d(TAG, "MainActivityFragment() called with: " + "");
         list = new ArrayList<>();
         mAdapter = new MoviesRecyclerAdapter(list, this);
-        mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+
     }
 
     //2
@@ -75,12 +75,12 @@ public class MainActivityFragment extends Fragment implements OnLoadMoreScrollLi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-//        Log.d(TAG, "onCreateView() called with: " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
+        Log.d(TAG, "onCreateView() called with: " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
         root = inflater.inflate(R.layout.fragment_main, container, false);
         mRecyclerView = (RecyclerView) root.findViewById(R.id.main_fragment_recycler_view);
+        mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
-
         mRecyclerView.addOnScrollListener(new OnLoadMoreScrollListener(this));
         apiService.getPopularMovies(DEFAULT_PAGE_NO, LIMIT).enqueue(new GetPopularMoviesCallback());
         return root;

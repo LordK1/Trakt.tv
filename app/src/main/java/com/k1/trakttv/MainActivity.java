@@ -14,10 +14,11 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
+import android.view.inputmethod.EditorInfo;
 
 import com.k1.trakttv.adapter.SuggestionsAdapter;
 import com.k1.trakttv.api.ApiService;
@@ -37,17 +38,17 @@ import retrofit2.Response;
 
 /**
  * Main Activity of application to show some fragments and handle navigation between {@link MainActivityFragment}
- * <p>
+ * <p/>
  * Created by K1 on 7/17/16.
  */
 public class MainActivity extends AppCompatActivity implements OnMainCallback {
 
     public static final String TITLE_COLUMN_NAME = "title";
+    public static final String MOVIE_TYPE = "movie";
     private static final String ID_COLUMN_NAME = "_id";
     private static final String URL_COLUMN_NAME = "url";
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String[] columns = new String[]{ID_COLUMN_NAME, URL_COLUMN_NAME, TITLE_COLUMN_NAME};
-
     @Inject
     ApiService service;
     private Toolbar toolbar;
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements OnMainCallback {
         ((MainApplication) getApplication()).getAppComponent().inject(this);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new MainActivityFragment(), MainActivityFragment.FRAGMENT_NAME)
+                .addToBackStack(MainActivityFragment.FRAGMENT_NAME)
                 .commit();
     }
 
@@ -82,116 +84,63 @@ public class MainActivity extends AppCompatActivity implements OnMainCallback {
         mSearchView.setSubmitButtonEnabled(true);
         mSearchView.setBackground(ContextCompat.getDrawable(MainActivity.this, R.drawable.green_rounded_border));
         mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-
+        mSearchView.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
         mSuggestionsAdapter = new SuggestionsAdapter(this, R.layout.suggestion_item, null, columns, null, 0);
+
         mSearchView.setSuggestionsAdapter(mSuggestionsAdapter);
         // listeners
-/*        mSearchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                final boolean actionViewExpanded = MenuItemCompat.isActionViewExpanded(item);
-                Log.d(TAG, "onFocusChange() called with: " + "view = [" + view + "], b = [" + b + "]"
-                        + " actionViewExpanded : " + actionViewExpanded
-                );
-                *//*if (actionViewExpanded){
-                    getSupportFragmentManager()
-                            .beginTransaction()
-                            .add(R.id.fragment,new SearchResultFragment(),SearchResultFragment.FRAGMENT_NAME)
-                            .addToBackStack(SearchResultFragment.FRAGMENT_NAME)
-                            .commit();
-                }else {
-                    getSupportFragmentManager().popBackStackImmediate(SearchResultFragment.FRAGMENT_NAME,0);
-                }*//*
-
-            }
-        });*/
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 Log.d(TAG, "onQueryTextSubmit() called with: " + "query = [" + query + "]");
                 if (query != null && !TextUtils.isEmpty(query)) {
-                    gotoSearchResults(query);
+                    mSearchView.clearFocus();
+                    updateSearchResults(query);
                     return true;
                 }
                 return false;
             }
 
+            // 1
             @Override
             public boolean onQueryTextChange(String newText) {
                 Log.d(TAG, "onQueryTextChange() called with: " + "newText = [" + newText + "]");
-                if (newText.length() > 2) {
+                if (newText.length() > 1) {
                     fetchSuggestion(newText);
                     return true;
                 }
                 return false;
             }
         });
-
-        mSearchView.setOnSearchClickListener(new View.OnClickListener() {
+        mSearchView.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+                Log.d(TAG, "onKey() called with: " + "view = [" + view + "], i = [" + i + "], keyEvent = [" + keyEvent + "]");
+                return false;
+            }
+        });
+        // 2
+        /*mSearchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 Log.d(TAG, "onClick() called with: " + "view = [" + view + "]");
 
             }
-        });
+        });*/
 
-        mSearchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
-            @Override
-            public boolean onSuggestionSelect(int position) {
-                Log.d(TAG, " ------------ onSuggestionSelect() called with: " + "position = [" + position + "]" +
-                        " ˚¬˚ ITEM : " + mSuggestionsAdapter.getItem(position)
-                );
-                final MatrixCursor matrixCursor = (MatrixCursor) mSuggestionsAdapter.getItem(position);
-                final String title = matrixCursor.getString(matrixCursor.getColumnIndex(TITLE_COLUMN_NAME));
-                mSearchView.setQuery(title, true);
-                mSearchView.clearFocus();
-                return true;
-            }
-
-            @Override
-            public boolean onSuggestionClick(int position) {
-                Log.d(TAG, "onSuggestionClick() called with: " + "position = [" + position + "]" +
-                        " Item : " + mSuggestionsAdapter.getItem(position) +
-                        " ->>>->>>>->>>");
-                final MatrixCursor mSelectedItem = (MatrixCursor) mSuggestionsAdapter.getItem(position);
-                final String title = mSelectedItem.getString(mSelectedItem.getColumnIndex(TITLE_COLUMN_NAME));
-                mSearchView.setQuery(title, true);
-                mSearchView.clearFocus();
-
-                return true;
-            }
-        });
-
-        mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                Log.d(TAG, "onClose() called with: " + "");
-                return true;
-            }
-        });
-
+        mSearchView.setOnSuggestionListener(new OnSuggestionListener());
 
         return true;
     }
 
     /**
-     * To show {@link SearchResultFragment} with defined query
+     * To update results {@link SearchResultFragment} with defined query
      *
      * @param query
      */
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void gotoSearchResults(@NonNull String query) {
-        if (!(getSupportFragmentManager().findFragmentById(R.id.fragment_container) instanceof SearchResultFragment)){
-
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, SearchResultFragment.newInstance(query), SearchResultFragment.FRAGMENT_NAME)
-                    .addToBackStack(SearchResultFragment.FRAGMENT_NAME)
-                    .commit();
-        }else {
-            ((SearchResultFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container)).updateQuery(query);
-        }
-
+    private void updateSearchResults(@NonNull String query) {
+        ((SearchResultFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container)).updateQuery(query);
     }
 
     /**
@@ -201,30 +150,10 @@ public class MainActivity extends AppCompatActivity implements OnMainCallback {
      */
     private void fetchSuggestion(String query) {
         Log.d(TAG, "fetchSuggestion() called with: " + "query = [" + query + "]");
-        service.search("movie", query, 0, 10).enqueue(new Callback<List<Result>>() {
-            @Override
-            public void onResponse(Call<List<Result>> call, Response<List<Result>> response) {
-                Log.d(TAG, "onResponse() called with: " + "call = [" + call + "], response = [" + response + "]"
-                        + " raw : " + response.raw()
-                );
-                if (response.isSuccessful()) {
-                    MatrixCursor matrixCursor = convertToCursor(response.body());
-                    mSuggestionsAdapter.changeCursor(matrixCursor);
-                } else {
-                    try {
-                        Log.i(TAG, " ERROR : " + response.errorBody().string());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Result>> call, Throwable t) {
-                t.printStackTrace();
-            }
-        });
-
+        // show some real time suggestions
+        service.search(MOVIE_TYPE, query, 0, 3).enqueue(new GetSuggestionListCallback());
+        // after
+        updateSearchResults(query);
     }
 
     /**
@@ -250,16 +179,87 @@ public class MainActivity extends AppCompatActivity implements OnMainCallback {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_search:
-                Toast.makeText(MainActivity.this, "Search : "
-                                + mSearchView.getQuery()
-                        , Toast.LENGTH_SHORT).show();
-
-
-                return true;
+                if (!(getSupportFragmentManager().findFragmentById(R.id.fragment_container) instanceof SearchResultFragment)) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, new SearchResultFragment(), SearchResultFragment.FRAGMENT_NAME)
+                            .addToBackStack(SearchResultFragment.FRAGMENT_NAME)
+                            .commit();
+                    return true;
+                }
         }
 
         return super.onOptionsItemSelected(item);
     }
 
 
+    /**
+     * When {@link Response} of {@link ApiService#search(String, String, Integer, Integer)}
+     * received
+     * // Notice: 7/19/16 it might cause overwhelming or user confusing, But I want to handle something more than simple search
+     */
+    private class GetSuggestionListCallback implements Callback<List<Result>> {
+        @Override
+        public void onResponse(Call<List<Result>> call, Response<List<Result>> response) {
+            /*Log.d(TAG, "onResponse() called with: " + "call = [" + call + "], response = [" + response + "]"
+                    + " raw : " + response.raw());*/
+            if (response.isSuccessful()) {
+                mSuggestionsAdapter.changeCursor(convertToCursor(response.body()));
+            } else {
+                try {
+                    Log.i(TAG, " ERROR : " + response.errorBody().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        @Override
+        public void onFailure(Call<List<Result>> call, Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
+    /**
+     * To handle {@link SuggestionsAdapter} callbacks with two interactions
+     * Selected or Clicked might not have different in this scenario
+     */
+    private class OnSuggestionListener implements SearchView.OnSuggestionListener {
+        @Override
+        public boolean onSuggestionSelect(int position) {
+            /*Log.d(TAG, " ------------ onSuggestionSelect() called with: " + "position = [" + position + "]" +
+                    " ˚¬˚ ITEM : " + mSuggestionsAdapter.getItem(position)
+            );*/
+            doSuggestion(position);
+            return true;
+        }
+
+        /**
+         * When suggestion item clicked or selected, just set query of {@link #mSearchView}
+         * and submit it.
+         *
+         * @param position
+         */
+        private void doSuggestion(int position) {
+            final MatrixCursor matrixCursor = (MatrixCursor) mSuggestionsAdapter.getItem(position);
+            final String title = matrixCursor.getString(matrixCursor.getColumnIndex(TITLE_COLUMN_NAME));
+            mSearchView.setQuery(title, true);
+            mSearchView.clearFocus();
+        }
+
+        /**
+         * When Suggestion list clicked
+         *
+         * @param position
+         * @return
+         */
+        @Override
+        public boolean onSuggestionClick(int position) {
+            /*Log.d(TAG, "onSuggestionClick() called with: " + "position = [" + position + "]" +
+                    " Item : " + mSuggestionsAdapter.getItem(position) +
+                    " ->>>->>>>->>>");*/
+            doSuggestion(position);
+
+            return true;
+        }
+    }
 }

@@ -4,12 +4,14 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +21,7 @@ import com.k1.trakttv.api.ApiService;
 import com.k1.trakttv.callback.OnLoadMoreScrollListener;
 import com.k1.trakttv.callback.ResultViewHolderCallback;
 import com.k1.trakttv.model.Result;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,8 +81,10 @@ public class SearchResultFragment extends Fragment implements ResultViewHolderCa
 
 
         // Query process
-        mQuery = getArguments().getString(QUERY_KEY);
-        apiService.search(MOVIE_TYPE, mQuery, PAGE_NO, LIMIT).enqueue(new GetResultListCallback(true));
+        if (getArguments() != null && getArguments().containsKey(QUERY_KEY)) {
+            mQuery = getArguments().getString(QUERY_KEY);
+            apiService.search(MOVIE_TYPE, mQuery, PAGE_NO, LIMIT).enqueue(new GetResultListCallback(true));
+        }
     }
 
     @Override
@@ -100,6 +105,8 @@ public class SearchResultFragment extends Fragment implements ResultViewHolderCa
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mAdapter);
 
+
+
         return root;
     }
 
@@ -107,6 +114,7 @@ public class SearchResultFragment extends Fragment implements ResultViewHolderCa
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onActivityCreated() called with: " + "savedInstanceState = [" + savedInstanceState + "]");
         super.onActivityCreated(savedInstanceState);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Search Results");
     }
 
     /**
@@ -169,14 +177,31 @@ public class SearchResultFragment extends Fragment implements ResultViewHolderCa
         private class ResultViewHolder extends RecyclerView.ViewHolder {
 
             private final TextView mTitleTextView;
+            private final TextView mOverviewTextView;
+            private final ImageView mTumbnailImageView;
+            private final TextView mYearTextView;
 
             public ResultViewHolder(View view) {
                 super(view);
+                mTumbnailImageView = (ImageView) view.findViewById(R.id.result_tumbnail_image_view);
                 mTitleTextView = (TextView) view.findViewById(R.id.result_title_text_view);
+                mOverviewTextView = (TextView) view.findViewById(R.id.result_overview_text_view);
+                mYearTextView = (TextView) view.findViewById(R.id.result_year_text_view);
             }
 
+            /**
+             * To bind {@link Result} item into {@link ResultViewHolder}
+             *
+             * @param result
+             */
             public void onBind(Result result) {
-                mTitleTextView.setText(result.toString());
+                mTitleTextView.setText(result.getMovie().getTitle());
+                mYearTextView.setText(String.valueOf(result.getMovie().getYear()));
+                mOverviewTextView.setText(result.getMovie().getOverview());
+                Picasso.with(getContext())
+                        .load(result.getMovie().getPhotos().getPoster().getThumb())
+                        .fit()
+                        .into(mTumbnailImageView);
             }
         }
     }
