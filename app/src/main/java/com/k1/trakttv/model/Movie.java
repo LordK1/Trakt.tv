@@ -1,9 +1,14 @@
 package com.k1.trakttv.model;
 
+import android.annotation.TargetApi;
+import android.icu.text.NumberFormat;
+import android.os.Build;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by K1 on 7/16/16.
@@ -49,6 +54,7 @@ public class Movie {
     @SerializedName("images")
     private Photos photos;
 
+    // Overridden
     @Override
     public String toString() {
         return "Movie{" +
@@ -68,6 +74,20 @@ public class Movie {
                 '}';
     }
 
+    // Shortcuts
+
+    /**
+     * To return back String formatted comma separated {@link #votes}
+     * // FIXME: 7/18/16 Find solution for android versions
+     *
+     * @return
+     */
+    @TargetApi(Build.VERSION_CODES.N)
+    public String getVotesFormatted() {
+        return NumberFormat.getNumberInstance(Locale.US).format(this.votes);
+    }
+
+    // Getters & Setters
     public String getTitle() {
         return title;
     }

@@ -22,7 +22,7 @@ public class OnLoadMoreScrollListener extends RecyclerView.OnScrollListener {
     private boolean isLoading = true;
     private int previousTotal = 0;
     private int threshold = 0;
-    private int mPageCounter = 0;
+    private int mPageCounter = 1;
     private int totalCount = 0;
 
     public OnLoadMoreScrollListener(OnLoadMoreCallback callback) {

@@ -2,6 +2,7 @@ package com.k1.trakttv.dependency;
 
 import com.k1.trakttv.MainActivity;
 import com.k1.trakttv.MainActivityFragment;
+import com.k1.trakttv.fragment.SearchResultFragment;
 
 import dagger.Component;
 
@@ -27,4 +28,12 @@ public interface AppComponent {
      * @param fragment
      */
     void inject(MainActivityFragment fragment);
+
+
+    /**
+     * To {@link javax.inject.Inject} {@link AppModule} into extended {@link SearchResultFragment}
+     *
+     * @param fragment
+     */
+    void inject(SearchResultFragment fragment);
 }

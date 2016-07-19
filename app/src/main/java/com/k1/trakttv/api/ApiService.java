@@ -1,6 +1,7 @@
 package com.k1.trakttv.api;
 
 import com.k1.trakttv.model.Movie;
+import com.k1.trakttv.model.Result;
 
 import java.util.List;
 
@@ -25,8 +26,8 @@ public interface ApiService {
 
 
     @GET("/search/{type}")
-    Call<List<Movie>> search(@Path("type") String type,
-                             @Query("query") String query,
-                             @Query("page") Integer pageNo,
-                             @Query("limit") Integer limit);
+    Call<List<Result>> search(@Path("type") String type,
+                              @Query("query") String query,
+                              @Query("page") Integer pageNo,
+                              @Query("limit") Integer limit);
 }

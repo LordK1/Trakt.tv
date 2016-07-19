@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.k1.trakttv.adapter.MoviesRecyclerAdapter;
 import com.k1.trakttv.api.ApiService;
+import com.k1.trakttv.callback.MovieViewHolderCallback;
 import com.k1.trakttv.callback.OnLoadMoreScrollListener;
 import com.k1.trakttv.callback.OnMainCallback;
 import com.k1.trakttv.model.Movie;
@@ -33,14 +34,16 @@ import retrofit2.Response;
 /**
  * Load List of {@link Movie} and bind into {@link MainActivityFragment#mRecyclerView}
  * via {@link MoviesRecyclerAdapter}, handle loadMore process with in {@link com.k1.trakttv.callback.OnLoadMoreScrollListener.OnLoadMoreCallback}
- * <p/>
+ * <p>
  * Created by K1 on 7/17/16.
  */
-public class MainActivityFragment extends Fragment implements OnLoadMoreScrollListener.OnLoadMoreCallback {
+public class MainActivityFragment extends Fragment implements OnLoadMoreScrollListener.OnLoadMoreCallback, MovieViewHolderCallback {
 
-    private static final String TAG = MainActivityFragment.class.getSimpleName();
     public static final int LIMIT = 10;
     public static final int DEFAULT_PAGE_NO = 1;
+    public static final String FRAGMENT_NAME = MainActivityFragment.class.getSimpleName();
+    private static final String TAG = MainActivityFragment.class.getSimpleName();
+
     @Inject
     ApiService apiService;
     private View root;
@@ -54,18 +57,17 @@ public class MainActivityFragment extends Fragment implements OnLoadMoreScrollLi
 
     //0
     public MainActivityFragment() {
-        Log.d(TAG, "MainActivityFragment() called with: " + "");
+//        Log.d(TAG, "MainActivityFragment() called with: " + "");
         list = new ArrayList<>();
-        mAdapter = new MoviesRecyclerAdapter(list);
+        mAdapter = new MoviesRecyclerAdapter(list, this);
         mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
-
     }
 
     //2
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate() called with: " + "savedInstanceState = [" + savedInstanceState + "]");
+//        Log.d(TAG, "onCreate() called with: " + "savedInstanceState = [" + savedInstanceState + "]");
         ((MainApplication) getActivity().getApplication()).getAppComponent().inject(this);
     }
 
@@ -73,7 +75,7 @@ public class MainActivityFragment extends Fragment implements OnLoadMoreScrollLi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView() called with: " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
+//        Log.d(TAG, "onCreateView() called with: " + "inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
         root = inflater.inflate(R.layout.fragment_main, container, false);
         mRecyclerView = (RecyclerView) root.findViewById(R.id.main_fragment_recycler_view);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -88,7 +90,7 @@ public class MainActivityFragment extends Fragment implements OnLoadMoreScrollLi
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Log.d(TAG, "onAttach() called with: " + "context = [" + context + "]");
+//        Log.d(TAG, "onAttach() called with: " + "context = [" + context + "]");
         if (context instanceof OnMainCallback) {
             callback = (OnMainCallback) context;
         } else {
@@ -101,19 +103,41 @@ public class MainActivityFragment extends Fragment implements OnLoadMoreScrollLi
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(TAG, "onActivityCreated() called with: " + "savedInstanceState = [" + savedInstanceState + "]");
+//        Log.d(TAG, "onActivityCreated() called with: " + "savedInstanceState = [" + savedInstanceState + "]");
     }
 
     @Override
     public void onLoadMore(int pageNumber) {
-        Log.d(TAG, "onLoadMore() called with: " + "pageNumber = [" + pageNumber + "]");
-        Snackbar.make(root,"Is Loading More ...",Snackbar.LENGTH_SHORT).show();
+//        Log.d(TAG, "onLoadMore() called with: " + "pageNumber = [" + pageNumber + "]");
+        Snackbar.make(root, "Is Loading More ...", Snackbar.LENGTH_SHORT).show();
         apiService.getPopularMovies(pageNumber, LIMIT).enqueue(new GetPopularMoviesCallback());
     }
 
     @Override
     public LinearLayoutManager getLayoutManager() {
         return mLayoutManager;
+    }
+
+    @Override
+    public Movie onUpVoteClick(Movie movie) {
+        Toast.makeText(getContext(), movie.getTitle() + " onUpVoteClick !!!", Toast.LENGTH_SHORT).show();
+        return movie;
+    }
+
+    @Override
+    public void onMovieClick(Movie movie) {
+        Toast.makeText(getContext(), movie.getTitle() + " onMovieClick !!!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onMovieLongClick(Movie movie) {
+        Toast.makeText(getContext(), movie.getTitle() + " onMovieLongClick !!!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public Movie onMovieExtraClick(Movie movie) {
+        Toast.makeText(getContext(), movie.getTitle() + " onMovieExtraClick !!!", Toast.LENGTH_SHORT).show();
+        return null;
     }
 
 
@@ -123,7 +147,6 @@ public class MainActivityFragment extends Fragment implements OnLoadMoreScrollLi
     private class GetPopularMoviesCallback implements Callback<List<Movie>> {
         @Override
         public void onResponse(Call<List<Movie>> call, Response<List<Movie>> response) {
-            Log.d(TAG, "onResponse() called with: " + "call = [" + call + "], response = [" + response + "]");
             if (response.isSuccessful()) {
                 list.addAll(response.body());
                 mAdapter.notifyDataSetChanged();

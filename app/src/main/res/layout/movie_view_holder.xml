@@ -4,9 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="15dp"
+    android:layout_marginEnd="3dp"
+    android:layout_marginStart="3dp"
+    android:layout_marginTop="15dp"
     app:cardCornerRadius="2dp"
-    app:cardElevation="20dp"
-    app:contentPadding="7dp">
+    app:cardElevation="10dp"
+    app:contentPadding="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -33,37 +37,50 @@
                 android:layout_height="55dp"
                 android:layout_gravity="bottom"
                 android:background="@drawable/vertical_gradient"
-                android:gravity="bottom">
+                android:gravity="bottom"
+                android:padding="3dp">
 
                 <TextView
                     android:id="@+id/movie_title_text_view"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_alignParentBottom="true"
                     android:layout_gravity="bottom|left"
+                    android:layout_marginEnd="150dp"
+                    android:layout_marginRight="130dp"
                     android:backgroundTintMode="multiply"
+                    android:ellipsize="end"
                     android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
-                    android:padding="3dp"
+                    android:maxLines="1"
                     android:textAppearance="@android:style/TextAppearance.Material.Caption"
                     android:textColor="@android:color/white"
                     android:textSize="20sp"
                     tools:targetApi="lollipop" />
 
+                <ImageButton
+                    android:id="@+id/movie_extra_menu"
+                    android:layout_width="24dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentBottom="false"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:background="?attr/selectableItemBackground"
+                    android:src="@drawable/ic_menu" />
+
                 <RelativeLayout
+                    android:id="@+id/movie_votes_container"
                     style="@style/Widget.AppCompat.Button.Borderless.Colored"
                     android:layout_width="120dp"
                     android:layout_height="match_parent"
                     android:layout_alignParentBottom="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentLeft="false"
-                    android:layout_alignParentRight="true"
-                    android:layout_margin="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_toLeftOf="@id/movie_extra_menu"
+                    android:layout_toStartOf="@id/movie_extra_menu"
                     android:background="@drawable/green_rounded_border"
                     android:backgroundTintMode="multiply"
                     android:gravity="center_horizontal"
-
-                    tools:ignore="RtlHardcoded"
                     tools:targetApi="lollipop">
 
 
@@ -86,6 +103,7 @@
                         android:src="@drawable/ic_up_vote" />
 
                 </RelativeLayout>
+
 
             </RelativeLayout>
 
