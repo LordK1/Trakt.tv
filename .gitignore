@@ -81,7 +81,7 @@ bh_unicode_properties.cache
 GitHub.sublime-settings
 ### Android template
 # Built application files
-*.apk
+#*.apk
 *.ap_
 
 # Files for the ART/Dalvik VM

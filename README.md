@@ -26,7 +26,7 @@ As I tested on Nexus series it would be Ok and works as well as possible !
 CAUTION: Some Functionality might not work properly in Android version lower than 5 !!!
 
 ## Installation:
-You can download APK file from this [link]() 
+You can download APK file from this [link](app/app-release.apk), 
 Or make it from source as below :
 
     git clone git@bitbucket.org:LordK1/trakt.tv.git 
