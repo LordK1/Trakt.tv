@@ -38,12 +38,12 @@
             android:layout_toRightOf="@id/result_tumbnail_image_view"
 
             android:ellipsize="end"
+            android:fontFamily="sans-serif-condensed"
             android:maxLines="2"
             android:text="Title ...."
             android:textAppearance="@android:style/TextAppearance.Material.Caption"
             android:textColor="@color/colorPrimary"
             android:textSize="22sp"
-            android:fontFamily="sans-serif-condensed"
             tools:ignore="NewApi" />
 
 
@@ -66,18 +66,18 @@
             android:layout_alignLeft="@id/result_title_text_view"
             android:layout_alignStart="@id/result_title_text_view"
             android:layout_below="@id/result_year_text_view"
-            android:scrollbars="vertical"
             android:overScrollMode="ifContentScrolls"
-            >
+            android:scrollbars="vertical">
 
 
             <TextView
                 android:id="@+id/result_overview_text_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:elegantTextHeight="true"
+                android:ellipsize="end"
                 android:fontFamily="serif"
                 android:text="lorem ipsum ...."
-                android:elegantTextHeight="true"
                 android:textColor="@android:color/secondary_text_light"
                 tools:targetApi="jelly_bean" />
         </android.support.v4.widget.NestedScrollView>

@@ -3,4 +3,17 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="movie_card_view_margin_bottom">15dp</dimen>
+    <dimen name="movie_card_view_margin_horizontal">3dp</dimen>
+    <dimen name="movie_card_view_margin_vertical">15dp</dimen>
+    <dimen name="card_view_corner_radius">2dp</dimen>
+    <dimen name="card_view_elevation">10dp</dimen>
+    <dimen name="card_view_content_padding">1dp</dimen>
+    <dimen name="movie_card_view_height">275dp</dimen>
+    <dimen name="movie_card_bottom_container_height">55dp</dimen>
+    <dimen name="movie_card_bottom_container_padding">3dp</dimen>
+    <dimen name="movie_card_title_margin_end">150dp</dimen>
+    <dimen name="title_text_size">20sp</dimen>
+    <dimen name="votes_height">32dp</dimen>
+    <dimen name="votes_width">32dp</dimen>
 </resources>

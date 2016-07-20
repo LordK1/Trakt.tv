@@ -109,7 +109,7 @@ public class MainActivityFragment extends Fragment implements OnLoadMoreScrollLi
     @Override
     public void onLoadMore(int pageNumber) {
 //        Log.d(TAG, "onLoadMore() called with: " + "pageNumber = [" + pageNumber + "]");
-        Snackbar.make(root, "Is Loading More ...", Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(root, R.string.loading_more, Snackbar.LENGTH_SHORT).show();
         apiService.getPopularMovies(pageNumber, LIMIT).enqueue(new GetPopularMoviesCallback());
     }
 

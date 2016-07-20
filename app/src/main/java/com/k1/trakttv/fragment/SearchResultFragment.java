@@ -3,6 +3,7 @@ package com.k1.trakttv.fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,18 +12,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.k1.trakttv.MainApplication;
 import com.k1.trakttv.R;
+import com.k1.trakttv.adapter.ResultRecyclerAdapter;
 import com.k1.trakttv.api.ApiService;
 import com.k1.trakttv.callback.OnLoadMoreScrollListener;
 import com.k1.trakttv.callback.ResultViewHolderCallback;
 import com.k1.trakttv.model.Result;
-import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +35,8 @@ import retrofit2.Response;
 /**
  * Created by K1 on 7/19/16.
  */
-public class SearchResultFragment extends Fragment implements ResultViewHolderCallback, OnLoadMoreScrollListener.OnLoadMoreCallback {
+public class SearchResultFragment extends Fragment implements ResultViewHolderCallback,
+        OnLoadMoreScrollListener.OnLoadMoreCallback {
 
     public static final String FRAGMENT_NAME = SearchResultFragment.class.getName();
 
@@ -56,7 +57,7 @@ public class SearchResultFragment extends Fragment implements ResultViewHolderCa
 
     public SearchResultFragment() {
         mResults = new ArrayList<>();
-        mAdapter = new ResultRecyclerAdapter(mResults, this);
+        mAdapter = new ResultRecyclerAdapter(this, mResults, this);
     }
 
     /**
@@ -64,7 +65,6 @@ public class SearchResultFragment extends Fragment implements ResultViewHolderCa
      * @return
      */
     public static SearchResultFragment newInstance(String query) {
-
         Bundle args = new Bundle();
         args.putString(QUERY_KEY, query);
         SearchResultFragment fragment = new SearchResultFragment();
@@ -106,7 +106,6 @@ public class SearchResultFragment extends Fragment implements ResultViewHolderCa
         mRecyclerView.setAdapter(mAdapter);
 
 
-
         return root;
     }
 
@@ -130,8 +129,8 @@ public class SearchResultFragment extends Fragment implements ResultViewHolderCa
 
     @Override
     public void onLoadMore(int pageNumber) {
-        Toast.makeText(getContext(), String.valueOf(pageNumber), Toast.LENGTH_SHORT).show();
         apiService.search(MOVIE_TYPE, mQuery, pageNumber, LIMIT).enqueue(new GetResultListCallback(false));
+        Snackbar.make(root, R.string.loading_more, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
@@ -139,71 +138,16 @@ public class SearchResultFragment extends Fragment implements ResultViewHolderCa
         return mLayoutManager;
     }
 
-    /**
-     * To adaptation {@link Result} with {@link SearchResultFragment#mRecyclerView}
-     */
-    private class ResultRecyclerAdapter extends RecyclerView.Adapter {
-        private final ArrayList<Result> results;
-        private final ResultViewHolderCallback callback;
+    @Override
+    public boolean onResultLongClick(Result result) {
+        Toast.makeText(getContext(), result.getMovie().getTitle() + " Long clicked !!", Toast.LENGTH_SHORT).show();
+        return true;
+    }
 
-        public ResultRecyclerAdapter(ArrayList<Result> results, ResultViewHolderCallback callback) {
-            this.results = results;
-            this.callback = callback;
-        }
+    @Override
+    public void onResultClick(Result result) {
+        Toast.makeText(getContext(), result.getMovie().getTitle() + " clicked !!!", Toast.LENGTH_SHORT).show();
 
-        @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.result_view_holder, parent, false);
-            return new ResultViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-            ((ResultViewHolder) holder).onBind(getItem(position));
-        }
-
-        private Result getItem(int position) {
-            return results.get(position);
-        }
-
-        @Override
-        public int getItemCount() {
-            return results.size();
-        }
-
-        /**
-         * To bind {@link Result} object into view
-         */
-        private class ResultViewHolder extends RecyclerView.ViewHolder {
-
-            private final TextView mTitleTextView;
-            private final TextView mOverviewTextView;
-            private final ImageView mTumbnailImageView;
-            private final TextView mYearTextView;
-
-            public ResultViewHolder(View view) {
-                super(view);
-                mTumbnailImageView = (ImageView) view.findViewById(R.id.result_tumbnail_image_view);
-                mTitleTextView = (TextView) view.findViewById(R.id.result_title_text_view);
-                mOverviewTextView = (TextView) view.findViewById(R.id.result_overview_text_view);
-                mYearTextView = (TextView) view.findViewById(R.id.result_year_text_view);
-            }
-
-            /**
-             * To bind {@link Result} item into {@link ResultViewHolder}
-             *
-             * @param result
-             */
-            public void onBind(Result result) {
-                mTitleTextView.setText(result.getMovie().getTitle());
-                mYearTextView.setText(String.valueOf(result.getMovie().getYear()));
-                mOverviewTextView.setText(result.getMovie().getOverview());
-                Picasso.with(getContext())
-                        .load(result.getMovie().getPhotos().getPoster().getThumb())
-                        .fit()
-                        .into(mTumbnailImageView);
-            }
-        }
     }
 
     /**
@@ -220,19 +164,22 @@ public class SearchResultFragment extends Fragment implements ResultViewHolderCa
 
         @Override
         public void onResponse(Call<List<Result>> call, Response<List<Result>> response) {
-            Log.d(TAG, "onResponse() called with: " + "call = [" + call + "], response = [" + response + "]");
-
+//            Log.d(TAG, "onResponse() called with: " + "call = [" + call + "], response = [" + response + "]");
             if (response.isSuccessful()) {
                 mResults.addAll(response.body());
                 mAdapter.notifyDataSetChanged();
-
+            } else {
+                try {
+                    Toast.makeText(getContext(), response.errorBody().string(), Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
         @Override
         public void onFailure(Call<List<Result>> call, Throwable t) {
             t.printStackTrace();
-
         }
     }
 }

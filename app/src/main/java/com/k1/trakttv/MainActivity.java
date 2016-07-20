@@ -14,10 +14,8 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 
 import com.k1.trakttv.adapter.SuggestionsAdapter;
@@ -80,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements OnMainCallback {
         mSearchView.setIconified(true);
         mSearchView.setIconifiedByDefault(true);
         mSearchView.setQueryRefinementEnabled(true);
-        mSearchView.setQueryHint("Search in Movies ...");
+        mSearchView.setQueryHint(getString(R.string.search_hint));
         mSearchView.setSubmitButtonEnabled(true);
         mSearchView.setBackground(ContextCompat.getDrawable(MainActivity.this, R.drawable.green_rounded_border));
         mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
@@ -89,46 +87,7 @@ public class MainActivity extends AppCompatActivity implements OnMainCallback {
 
         mSearchView.setSuggestionsAdapter(mSuggestionsAdapter);
         // listeners
-        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                Log.d(TAG, "onQueryTextSubmit() called with: " + "query = [" + query + "]");
-                if (query != null && !TextUtils.isEmpty(query)) {
-                    mSearchView.clearFocus();
-                    updateSearchResults(query);
-                    return true;
-                }
-                return false;
-            }
-
-            // 1
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                Log.d(TAG, "onQueryTextChange() called with: " + "newText = [" + newText + "]");
-                if (newText.length() > 1) {
-                    fetchSuggestion(newText);
-                    return true;
-                }
-                return false;
-            }
-        });
-        mSearchView.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                Log.d(TAG, "onKey() called with: " + "view = [" + view + "], i = [" + i + "], keyEvent = [" + keyEvent + "]");
-                return false;
-            }
-        });
-        // 2
-        /*mSearchView.setOnSearchClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Log.d(TAG, "onClick() called with: " + "view = [" + view + "]");
-
-            }
-        });*/
-
+        mSearchView.setOnQueryTextListener(new OnQueryTextListener());
         mSearchView.setOnSuggestionListener(new OnSuggestionListener());
 
         return true;
@@ -149,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements OnMainCallback {
      * @param query
      */
     private void fetchSuggestion(String query) {
-        Log.d(TAG, "fetchSuggestion() called with: " + "query = [" + query + "]");
+//        Log.d(TAG, "fetchSuggestion() called with: " + "query = [" + query + "]");
         // show some real time suggestions
         service.search(MOVIE_TYPE, query, 0, 3).enqueue(new GetSuggestionListCallback());
         // after
@@ -260,6 +219,30 @@ public class MainActivity extends AppCompatActivity implements OnMainCallback {
             doSuggestion(position);
 
             return true;
+        }
+    }
+
+    private class OnQueryTextListener implements SearchView.OnQueryTextListener {
+        @Override
+        public boolean onQueryTextSubmit(String query) {
+//            Log.d(TAG, "onQueryTextSubmit() called with: " + "query = [" + query + "]");
+            if (query != null && !TextUtils.isEmpty(query)) {
+                mSearchView.clearFocus();
+                updateSearchResults(query);
+                return true;
+            }
+            return false;
+        }
+
+        // 1
+        @Override
+        public boolean onQueryTextChange(String newText) {
+//                Log.d(TAG, "onQueryTextChange() called with: " + "newText = [" + newText + "]");
+            if (!TextUtils.isEmpty(newText)) {
+                fetchSuggestion(newText);
+                return true;
+            }
+            return false;
         }
     }
 }

@@ -11,19 +11,19 @@ This project contains case study challenge for Software Engineer (Android) role 
 
 
 ##Used Features:
-- [Retrofit]()
-- [Dagger 2]()
+- [Retrofit 2](http://square.github.io/retrofit/)
+- [Dagger 2](http://google.github.io/dagger/)
 - [RxJava/RxAndroid](https://github.com/ReactiveX/RxAndroid)
-- [Robotium]()*
-- [Picasso]()
-- [GSON]()
-- [RecyclerView,CardView]()
-- [AppCompat v24]()
+- [Robotium](https://github.com/RobotiumTech/robotium)*
+- [Picasso](http://square.github.io/picasso/)
+- [GSON](https://github.com/google/gson)
+- [RecyclerView,CardView](https://developer.android.com/training/material/lists-cards.html)
+- [AppCompat v24](https://developer.android.com/topic/libraries/support-library/features.html)
 
 ## Supported Device :
 I don't have much time to handle multi android version support, But I think it must be OK on Android 5+.
 As I tested on Nexus series it would be Ok and works as well as possible !
-CAUTION: Some Functionality might not work properly in Android version lower 5 !!!
+CAUTION: Some Functionality might not work properly in Android version lower than 5 !!!
 
 ## Installation:
 You can download APK file from this [link]() 
@@ -31,14 +31,16 @@ Or make it from source as below :
 
     git clone git@bitbucket.org:LordK1/trakt.tv.git 
     // or git clone https://LordK1@bitbucket.org/LordK1/trakt.tv.git
-    
-    adb install <path_to_your_bin>.apk
+    cd Trakt.tv
+    ./gradlew clean
+    ./gradlew packageDebug
+    adb install app/build/outputs/apk/app-debug.apk
 
 
 ##Demonstration:
 
 In this simple sample I just try to use most up to dated technologies, third parties and libraries in android development,
-As as Android developer you always must be aware of what's going on, some momentary solutions
+As an Android developer you always must be aware of what's going on, some momentary solutions
 cause some big issues in the future.<br/>
 * I'm so sorry, but I really want to make Test Modules with Robotium or Essperso but I didn't have sufficient time. :"(
 

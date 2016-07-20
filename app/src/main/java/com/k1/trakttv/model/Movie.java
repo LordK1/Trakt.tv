@@ -1,6 +1,5 @@
 package com.k1.trakttv.model;
 
-import android.annotation.TargetApi;
 import android.icu.text.NumberFormat;
 import android.os.Build;
 
@@ -82,9 +81,13 @@ public class Movie {
      *
      * @return
      */
-    @TargetApi(Build.VERSION_CODES.N)
+
     public String getVotesFormatted() {
-        return NumberFormat.getNumberInstance(Locale.US).format(this.votes);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return NumberFormat.getNumberInstance(Locale.US).format(this.votes);
+        } else {
+            return String.format(Locale.US, "%,d", this.votes);
+        }
     }
 
     // Getters & Setters
