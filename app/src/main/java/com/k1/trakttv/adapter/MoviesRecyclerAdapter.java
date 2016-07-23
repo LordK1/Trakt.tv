@@ -1,5 +1,7 @@
 package com.k1.trakttv.adapter;
 
+import android.databinding.DataBindingUtil;
+import android.databinding.ViewDataBinding;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.k1.trakttv.BR;
 import com.k1.trakttv.R;
 import com.k1.trakttv.callback.MovieViewHolderCallback;
 import com.k1.trakttv.model.Movie;
@@ -33,14 +36,16 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_view_holder, parent, false);
-        return new MovieViewHolder(view);
+        final ViewDataBinding viewDataBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.movie_view_holder, parent, false);
+        return new MovieViewHolder(viewDataBinding);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((MovieViewHolder) holder).onBind(getItem(position));
 
+        final ViewDataBinding binding = ((MovieViewHolder) holder).getBinding();
+        /* check this fuckin variable Id is generalisable after code compilation */
+        binding.setVariable(BR.movie, getItem(position));
     }
 
     private Movie getItem(int position) {
@@ -49,7 +54,7 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return list != null ? list.size() : 0;
     }
 
 
@@ -64,17 +69,24 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         private final View view;
         private final TextView mVotesTextView;
         private final RelativeLayout mVotesContainer;
+        private final ViewDataBinding binding;
         private Movie movie;
 
 
-        public MovieViewHolder(View view) {
-            super(view);
-            this.view = view;
+        public MovieViewHolder(ViewDataBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+            this.view = this.binding.getRoot();
             titleTextView = (TextView) view.findViewById(R.id.movie_title_text_view);
             mExtraButton = (ImageButton) view.findViewById(R.id.movie_extra_menu);
             mVotesContainer = (RelativeLayout) view.findViewById(R.id.movie_votes_container);
             mVotesTextView = (TextView) view.findViewById(R.id.movie_votes_text_view);
             mImageView = (ImageView) view.findViewById(R.id.movie_tumbnail_image_view);
+        }
+
+
+        public ViewDataBinding getBinding() {
+            return binding;
         }
 
         /**

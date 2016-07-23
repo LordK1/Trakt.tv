@@ -1,5 +1,6 @@
 #Trakt.tv
 This project contains case study challenge for Software Engineer (Android) role of Trivago GmbH.
+Notice : to see some DataBinding Architecture version of project just checkout into mvp branch !!! 
 
 ##Tasks:
 - Connect with [Trakt.tv](http://docs.trakt.apiary.io/)
@@ -19,6 +20,7 @@ This project contains case study challenge for Software Engineer (Android) role 
 - [GSON](https://github.com/google/gson)
 - [RecyclerView,CardView](https://developer.android.com/training/material/lists-cards.html)
 - [AppCompat v24](https://developer.android.com/topic/libraries/support-library/features.html)
+- [DataBinding](https://developer.android.com/topic/libraries/data-binding/index.html)
 
 ## Supported Device :
 I don't have much time to handle multi android version support, But I think it must be OK on Android 5+.

@@ -34,7 +34,7 @@ import retrofit2.Response;
 /**
  * Load List of {@link Movie} and bind into {@link MainActivityFragment#mRecyclerView}
  * via {@link MoviesRecyclerAdapter}, handle loadMore process with in {@link com.k1.trakttv.callback.OnLoadMoreScrollListener.OnLoadMoreCallback}
- * <p>
+ * <p/>
  * Created by K1 on 7/17/16.
  */
 public class MainActivityFragment extends Fragment implements OnLoadMoreScrollListener.OnLoadMoreCallback, MovieViewHolderCallback {

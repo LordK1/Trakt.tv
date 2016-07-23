@@ -2,6 +2,7 @@ package com.k1.trakttv;
 
 import android.app.Application;
 import android.content.res.Configuration;
+import android.support.multidex.MultiDex;
 import android.util.Log;
 
 import com.k1.trakttv.dependency.AppComponent;
@@ -22,6 +23,7 @@ public class MainApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "onCreate() called with: " + "");
+        MultiDex.install(getApplicationContext());
         appComponent = DaggerAppComponent.builder().appModule(new AppModule(this)).build();
     }
 

@@ -1,9 +1,12 @@
 package com.k1.trakttv.model;
 
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
 import android.icu.text.NumberFormat;
 import android.os.Build;
 
 import com.google.gson.annotations.SerializedName;
+import com.k1.trakttv.BR;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -12,8 +15,9 @@ import java.util.Locale;
 /**
  * Created by K1 on 7/16/16.
  */
-public class Movie {
+public class Movie extends BaseObservable {
 
+    @Bindable
     @SerializedName("title")
     private String title;
 
@@ -97,6 +101,7 @@ public class Movie {
 
     public void setTitle(String title) {
         this.title = title;
+        notifyPropertyChanged(BR.movie);
     }
 
     public Ids getIds() {
@@ -194,4 +199,6 @@ public class Movie {
     public void setPhotos(Photos photos) {
         this.photos = photos;
     }
+
+
 }
