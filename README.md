@@ -1,6 +1,7 @@
 #Trakt.tv
 This project contains case study challenge for Software Engineer (Android) role of Trivago GmbH.
-Notice : to see some DataBinding Architecture version of project just checkout into mvp branch !!! 
+
+##Notice : To see (MVP) DataBinding Android  Architecture version of project just checkout into mvp branch !!! 
 
 ##Tasks:
 - Connect with [Trakt.tv](http://docs.trakt.apiary.io/)
@@ -47,4 +48,4 @@ As an Android developer you always must be aware of what's going on, some moment
 cause some big issues in the future.<br/>
 * I'm so sorry, but I really want to make Test Modules with Robotium or Essperso but I didn't have sufficient time. :"(
 
-### It's my pleasure to hear your feedbacks :")
+### It's my pleasure to hear your feedback :")

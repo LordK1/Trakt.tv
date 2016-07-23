@@ -15,7 +15,6 @@ import com.k1.trakttv.BR;
 import com.k1.trakttv.R;
 import com.k1.trakttv.callback.MovieViewHolderCallback;
 import com.k1.trakttv.model.Movie;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -46,6 +45,7 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         final ViewDataBinding binding = ((MovieViewHolder) holder).getBinding();
         /* check this fuckin variable Id is generalisable after code compilation */
         binding.setVariable(BR.movie, getItem(position));
+        binding.setVariable(BR.callbacks, this.callback);
     }
 
     private Movie getItem(int position) {
@@ -61,7 +61,7 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     /**
      * extended {@link MovieViewHolder} class to bind it
      */
-    private class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    private class MovieViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView titleTextView;
         private final ImageView mImageView;
@@ -88,52 +88,6 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         public ViewDataBinding getBinding() {
             return binding;
         }
-
-        /**
-         * To bind {@link Movie} into {@link MovieViewHolder}
-         *
-         * @param movie
-         */
-        public void onBind(final Movie movie) {
-            this.movie = movie;
-            view.setOnClickListener(this);
-            view.setOnLongClickListener(this);
-            titleTextView.setText(movie.getTitle());
-            mVotesTextView.setText(movie.getVotesFormatted());
-
-            mVotesContainer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-//                    Toast.makeText(view.getContext(), movie.getTitle() + " Up Voted !!! ", Toast.LENGTH_SHORT).show();
-                    callback.onUpVoteClick(movie);
-                }
-            });
-            mExtraButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-//                    Toast.makeText(view.getContext(), movie.getTitle() + "Extra Clicked !!!", Toast.LENGTH_SHORT).show();
-                    callback.onMovieExtraClick(movie);
-                }
-            });
-            Picasso.with(mImageView.getContext())
-                    .load(movie.getPhotos().getThumb().getFull())
-                    .fit()
-                    .into(mImageView);
-        }
-
-        @Override
-        public void onClick(View view) {
-//            Toast.makeText(view.getContext(), movie.toString(), Toast.LENGTH_SHORT).show();
-            callback.onMovieClick(movie);
-        }
-
-        @Override
-        public boolean onLongClick(View view) {
-//            Toast.makeText(view.getContext(), movie.getIds() + " Long Clicked !!!", Toast.LENGTH_SHORT).show();
-            callback.onMovieLongClick(movie);
-            return true;
-        }
-
 
     }
 

@@ -119,9 +119,13 @@ public class MainActivityFragment extends Fragment implements OnLoadMoreScrollLi
     }
 
     @Override
-    public Movie onUpVoteClick(Movie movie) {
-        Toast.makeText(getContext(), movie.getTitle() + " onUpVoteClick !!!", Toast.LENGTH_SHORT).show();
-        return movie;
+    public View onUpVoteClick(Movie movie, View view) {
+        movie.setVotes(movie.getVotes() + 1);
+        Toast.makeText(getContext(), movie.getTitle() + " from view ID : " + view.getId()
+                        + " And Votes : " + movie.getVotesFormatted()
+                , Toast.LENGTH_SHORT).show();
+        view.invalidate();
+        return view;
     }
 
     @Override
@@ -130,8 +134,11 @@ public class MainActivityFragment extends Fragment implements OnLoadMoreScrollLi
     }
 
     @Override
-    public void onMovieLongClick(Movie movie) {
-        Toast.makeText(getContext(), movie.getTitle() + " onMovieLongClick !!!", Toast.LENGTH_SHORT).show();
+    public boolean onMovieLongClick(String title, boolean hasTitle) {
+        Toast.makeText(getContext(),
+                "Title: " + title + " hasTitle : " + hasTitle,
+                Toast.LENGTH_SHORT).show();
+        return hasTitle;
     }
 
     @Override

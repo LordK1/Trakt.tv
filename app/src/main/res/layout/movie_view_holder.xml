@@ -8,8 +8,8 @@
             type="com.k1.trakttv.model.Movie" />
 
         <variable
-            name="presenter"
-            type="com.k1.trakttv.presenter.EventPresenter" />
+            name="callbacks"
+            type="com.k1.trakttv.callback.MovieViewHolderCallback" />
     </data>
 
     <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -29,6 +29,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:onClick="@{()-> callbacks.onMovieClick(movie)}"
+            android:onLongClick="@{(hasTitle)->callbacks.onMovieLongClick(movie.title,movie.title!=null)}"
             android:orientation="vertical">
 
             <android.support.v7.widget.ContentFrameLayout
@@ -68,7 +71,6 @@
                         android:fontFamily="sans-serif-condensed"
                         android:gravity="center_vertical"
                         android:maxLines="1"
-                        android:onClick="@{()-> presenter.onMovieClick(movie)}"
                         android:text="@{movie.title}"
                         android:textAppearance="@android:style/TextAppearance.Material.Caption"
                         android:textColor="@android:color/white"
@@ -83,6 +85,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentRight="true"
                         android:background="?attr/selectableItemBackground"
+                        android:onClick="@{()-> callbacks.onMovieExtraClick(movie)}"
                         android:src="@drawable/ic_menu" />
 
                     <RelativeLayout
@@ -98,15 +101,18 @@
                         android:background="@drawable/green_rounded_border"
                         android:backgroundTintMode="multiply"
                         android:gravity="center_horizontal"
-                        tools:targetApi="lollipop">
 
+                        android:onClick="@{(v)-> callbacks.onUpVoteClick(movie,v)}"
+
+
+                        tools:targetApi="lollipop">
 
                         <TextView
                             android:id="@+id/movie_votes_text_view"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
-                            android:text="6,324"
+                            android:text="@{movie.votesFormatted}"
                             android:textColor="@android:color/holo_orange_dark"
                             android:textSize="@dimen/title_text_size" />
 
@@ -115,6 +121,7 @@
                             android:layout_width="@dimen/votes_width"
                             android:layout_height="@dimen/votes_height"
                             android:layout_centerInParent="true"
+
                             android:layout_toRightOf="@id/movie_votes_text_view"
                             android:paddingBottom="5dp"
                             android:src="@drawable/ic_up_vote" />

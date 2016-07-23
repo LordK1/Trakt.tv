@@ -85,7 +85,6 @@ public class Movie extends BaseObservable {
      *
      * @return
      */
-
     public String getVotesFormatted() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             return NumberFormat.getNumberInstance(Locale.US).format(this.votes);
