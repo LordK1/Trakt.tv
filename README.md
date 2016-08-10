@@ -1,7 +1,8 @@
 #Trakt.tv
-This project contains case study challenge for Software Engineer (Android) role of Trivago GmbH.
-
-##Notice : To see (MVP) DataBinding Android  Architecture version of project just checkout into mvp branch !!! 
+This project contains case study challenge for Software Engineer (Android) role of Trivago GmbH at first Idea.
+But after I was rejected in recruiting process I've decided to make it complete and show some more of my abilities in Android Development ;"D
+### Notice : This is experimental Open source Android Project to gain more fluency in android development of mine. NOT included production Android Application !!!
+## Notice : To see (MVP) DataBinding Android  Architecture version of project just checkout into mvp branch !!! 
 
 ##Tasks:
 - Connect with [Trakt.tv](http://docs.trakt.apiary.io/)
@@ -10,7 +11,7 @@ This project contains case study challenge for Software Engineer (Android) role 
 - Search [Movies](http://docs.trakt.apiary.io/#reference/search)
 - Show Result with title, release, overview and a picture.
 - Load more and scrollable list of search results movies (handle pagination) 
-
+- Make Authorization process within the OAUTH 2.0 for Track.tv API's 
 
 ##Used Features:
 - [Retrofit 2](http://square.github.io/retrofit/)

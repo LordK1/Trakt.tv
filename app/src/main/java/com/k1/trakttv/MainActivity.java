@@ -3,10 +3,13 @@ package com.k1.trakttv;
 import android.annotation.TargetApi;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.database.MatrixCursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -17,11 +20,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Toast;
 
+import com.google.gson.JsonObject;
 import com.k1.trakttv.adapter.SuggestionsAdapter;
 import com.k1.trakttv.api.ApiService;
 import com.k1.trakttv.callback.OnMainCallback;
 import com.k1.trakttv.fragment.SearchResultFragment;
+import com.k1.trakttv.model.DeviceCode;
 import com.k1.trakttv.model.Movie;
 import com.k1.trakttv.model.Result;
 
@@ -145,11 +151,60 @@ public class MainActivity extends AppCompatActivity implements OnMainCallback {
                             .commit();
                     return true;
                 }
+            case R.id.action_login:
+                Log.i(TAG, "onOptionsItemSelected: clicked");
+                doSomeAuthorize();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * To make some Authorization
+     */
+    private void doSomeAuthorize() {
+        JsonObject object = new JsonObject();
+        object.addProperty("client_id", "e50771bf01afe4441d1b32d25c76d3c544de65cc449a16276ed4d05aff168168");
+        service.getDeviceCode(object).enqueue(new Callback<DeviceCode>() {
+            @Override
+            public void onResponse(Call<DeviceCode> call, Response<DeviceCode> response) {
+                Log.d(TAG, "onResponse() called with: " + "call = [" + call + "], response = [" + response + "]");
+                if (response.isSuccessful()) {
+                    final DeviceCode deviceCode = response.body();
+                    Log.d(TAG, " BODY : " + deviceCode.toString());
+//                    VerificationDialogFragment.newInstance(deviceCode)
+//                            .show(getSupportFragmentManager(), VerificationDialogFragment.FRAGMENT_NAME);
+                    Toast.makeText(MainActivity.this, "Your Verification Code is : "
+                                    + deviceCode.getUserCode()
+                            , Toast.LENGTH_SHORT).show();
+                    CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                    builder.setShowTitle(true);
+                    builder.setToolbarColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
+                    builder.setActionButton(null," Show The Code !!!",null,true);
+                    CustomTabsIntent customTabsIntent = builder.build();
+                    customTabsIntent.launchUrl(MainActivity.this, Uri.parse(deviceCode.getVerificationUrl()));
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DeviceCode> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
+
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.d(TAG, "onNewIntent() called with: " + "intent = [" + intent + "]"
+                + " Action : " + intent.getAction()
+                + " data : " + intent.getData()
+        );
+
+    }
 
     /**
      * When {@link Response} of {@link ApiService#search(String, String, Integer, Integer)}

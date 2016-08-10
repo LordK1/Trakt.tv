@@ -19,6 +19,11 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
+ *
+ * Client ID: e50771bf01afe4441d1b32d25c76d3c544de65cc449a16276ed4d05aff168168
+ Client Secret: 49bb1f723bd5ab766270edbb6ac43942a7ce6fc37847165af38008565c7cd188
+
+ *
  * Created by K1 on 7/17/16.
  */
 @Module
@@ -80,13 +85,16 @@ public class AppModule {
                     .url(queryUrl)
                     .addHeader("Accept", "application/json")
                     .addHeader("trakt-api-version", "2")
-                    .addHeader("trakt-api-key", "ad005b8c117cdeee58a1bdb7089ea31386cd489b21e14b19818c91511f12a086")
+//                  .addHeader("trakt-api-key", "ad005b8c117cdeee58a1bdb7089ea31386cd489b21e14b19818c91511f12a086")
+                    .addHeader("trakt-api-key", "e50771bf01afe4441d1b32d25c76d3c544de65cc449a16276ed4d05aff168168")
                     .method(original.method(), original.body())
                     .build();
 
             return chain.proceed(builder.build());
         }
     }
+
+
 
 
 }

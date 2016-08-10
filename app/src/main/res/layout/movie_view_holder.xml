@@ -101,10 +101,7 @@
                         android:background="@drawable/green_rounded_border"
                         android:backgroundTintMode="multiply"
                         android:gravity="center_horizontal"
-
                         android:onClick="@{(v)-> callbacks.onUpVoteClick(movie,v)}"
-
-
                         tools:targetApi="lollipop">
 
                         <TextView
