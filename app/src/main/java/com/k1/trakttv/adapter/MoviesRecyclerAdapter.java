@@ -35,7 +35,8 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final ViewDataBinding viewDataBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.movie_view_holder, parent, false);
+        final ViewDataBinding viewDataBinding = DataBindingUtil.inflate(
+                LayoutInflater.from(parent.getContext()), R.layout.movie_view_holder, parent, false);
         return new MovieViewHolder(viewDataBinding);
     }
 
