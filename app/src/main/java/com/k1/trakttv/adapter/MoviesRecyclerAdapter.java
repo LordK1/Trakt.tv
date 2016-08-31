@@ -82,7 +82,7 @@ public class MoviesRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             mExtraButton = (ImageButton) view.findViewById(R.id.movie_extra_menu);
             mVotesContainer = (RelativeLayout) view.findViewById(R.id.movie_votes_container);
             mVotesTextView = (TextView) view.findViewById(R.id.movie_votes_text_view);
-            mImageView = (ImageView) view.findViewById(R.id.movie_tumbnail_image_view);
+            mImageView = (ImageView) view.findViewById(R.id.movie_thumbnail_image_view);
         }
 
 

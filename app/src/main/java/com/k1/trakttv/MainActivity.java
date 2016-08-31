@@ -27,9 +27,10 @@ import com.k1.trakttv.adapter.SuggestionsAdapter;
 import com.k1.trakttv.api.ApiService;
 import com.k1.trakttv.callback.OnMainCallback;
 import com.k1.trakttv.fragment.SearchResultFragment;
-import com.k1.trakttv.model.DeviceCode;
 import com.k1.trakttv.model.Movie;
 import com.k1.trakttv.model.Result;
+import com.k1.trakttv.model.Token;
+import com.k1.trakttv.util.Constants;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,7 +43,7 @@ import retrofit2.Response;
 
 /**
  * Main Activity of application to show some fragments and handle navigation between {@link MainActivityFragment}
- * <p/>
+ * <p>
  * Created by K1 on 7/17/16.
  */
 public class MainActivity extends AppCompatActivity implements OnMainCallback {
@@ -53,11 +54,57 @@ public class MainActivity extends AppCompatActivity implements OnMainCallback {
     private static final String URL_COLUMN_NAME = "url";
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String[] columns = new String[]{ID_COLUMN_NAME, URL_COLUMN_NAME, TITLE_COLUMN_NAME};
+
+
     @Inject
     ApiService service;
     private Toolbar toolbar;
     private SearchView mSearchView;
     private SuggestionsAdapter mSuggestionsAdapter;
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart() called with: " + getIntent().getDataString());
+        // check received intent and data to handle OAuth redirect Uri
+        final Uri data = getIntent().getData();
+        if (data != null &&
+                data.getAuthority().equals("trakttv") &&
+                data.getScheme().equals("oauth") &&
+                data.getQueryParameter("code") != null
+                && data.getQueryParameter("state").equals(Constants.DEFAULT_STATE)) {
+            Log.i(TAG, " ===>>>> " + data
+                    + " getDataString :  " + getIntent().getDataString()
+                    + " Authority : " + data.getAuthority()
+                    + " Host : " + data.getHost()
+                    + " Path : " + data.getPath()
+                    + " Scheme : " + data.getScheme()
+                    + " Code : " + data.getQueryParameter("code")
+                    + " State : " + data.getQueryParameter("state")
+                    + " <<<<==="
+            );
+            final String code = data.getQueryParameter("code");
+            Toast.makeText(MainActivity.this, "Your Registration Step 01 Succeeded your code is : " +
+                            code
+                    , Toast.LENGTH_SHORT).show();
+            // now go in charge of Step 02 for Authorization progress
+            JsonObject object = new JsonObject();
+            object.addProperty("code", code);
+            object.addProperty("client_id", Constants.Client_ID);
+            object.addProperty("client_secret", Constants.Client_Secret);
+            object.addProperty("redirect_uri", Constants.REDIRECT_URI);
+            object.addProperty("grant_type", "authorization_code");
+            service.accessToken(object).enqueue(new TokenCallback());
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume() called with: " + "");
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,35 +211,21 @@ public class MainActivity extends AppCompatActivity implements OnMainCallback {
      * To make some Authorization
      */
     private void doSomeAuthorize() {
-        JsonObject object = new JsonObject();
-        object.addProperty("client_id", "e50771bf01afe4441d1b32d25c76d3c544de65cc449a16276ed4d05aff168168");
-        service.getDeviceCode(object).enqueue(new Callback<DeviceCode>() {
-            @Override
-            public void onResponse(Call<DeviceCode> call, Response<DeviceCode> response) {
-                Log.d(TAG, "onResponse() called with: " + "call = [" + call + "], response = [" + response + "]");
-                if (response.isSuccessful()) {
-                    final DeviceCode deviceCode = response.body();
-                    Log.d(TAG, " BODY : " + deviceCode.toString());
-//                    VerificationDialogFragment.newInstance(deviceCode)
-//                            .show(getSupportFragmentManager(), VerificationDialogFragment.FRAGMENT_NAME);
-                    Toast.makeText(MainActivity.this, "Your Verification Code is : "
-                                    + deviceCode.getUserCode()
-                            , Toast.LENGTH_SHORT).show();
-                    CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-                    builder.setShowTitle(true);
-                    builder.setToolbarColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
-                    builder.setActionButton(null," Show The Code !!!",null,true);
-                    CustomTabsIntent customTabsIntent = builder.build();
-                    customTabsIntent.launchUrl(MainActivity.this, Uri.parse(deviceCode.getVerificationUrl()));
 
-                }
-            }
-
-            @Override
-            public void onFailure(Call<DeviceCode> call, Throwable t) {
-                t.printStackTrace();
-            }
-        });
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(Constants.BASE_OAUTH_AUTHORIZE)
+                .append("response_type=code")
+                .append("&client_id=").append(Constants.Client_ID)
+                .append("&redirect_uri=").append(Constants.REDIRECT_URI)
+                .append("&state=").append(Constants.DEFAULT_STATE);
+        
+        Log.i(TAG, " AUTHORIZE URL : " + buffer);
+        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+        builder.setShowTitle(true);
+        builder.setToolbarColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
+        builder.setActionButton(null, " Show The Code !!!", null, true);
+        CustomTabsIntent customTabsIntent = builder.build();
+        customTabsIntent.launchUrl(MainActivity.this, Uri.parse(buffer.toString()));
 
     }
 
@@ -298,6 +331,36 @@ public class MainActivity extends AppCompatActivity implements OnMainCallback {
                 return true;
             }
             return false;
+        }
+    }
+
+    private class TokenCallback implements Callback<Token> {
+        @Override
+        public void onResponse(Call<Token> call, Response<Token> response) {
+            Log.d(TAG, "onResponse() called with: " + "call = [" + call + "], response = [" + response + "]"
+                    + " header : " + response.headers()
+            );
+            if (response.isSuccessful()) {
+                Log.i(TAG, " ===========================================\n"
+                        + " BODY : " + response.body()
+                        + " ===========================================\n"
+                );
+                Toast.makeText(MainActivity.this, "Your registration Succeeded : "
+                                + response.body()
+                        , Toast.LENGTH_SHORT).show();
+
+            } else {
+                try {
+                    Toast.makeText(MainActivity.this, response.errorBody().string(), Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        @Override
+        public void onFailure(Call<Token> call, Throwable t) {
+            t.printStackTrace();
         }
     }
 }

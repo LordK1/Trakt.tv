@@ -42,7 +42,7 @@
 
 
                 <ImageView
-                    android:id="@+id/movie_tumbnail_image_view"
+                    android:id="@+id/movie_thumbnail_image_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
@@ -118,7 +118,6 @@
                             android:layout_width="@dimen/votes_width"
                             android:layout_height="@dimen/votes_height"
                             android:layout_centerInParent="true"
-
                             android:layout_toRightOf="@id/movie_votes_text_view"
                             android:paddingBottom="5dp"
                             android:src="@drawable/ic_up_vote" />

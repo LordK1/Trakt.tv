@@ -5,6 +5,7 @@ import android.app.Application;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.k1.trakttv.api.ApiService;
+import com.k1.trakttv.util.Constants;
 
 import java.io.IOException;
 
@@ -19,11 +20,9 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
- *
- * Client ID: e50771bf01afe4441d1b32d25c76d3c544de65cc449a16276ed4d05aff168168
- Client Secret: 49bb1f723bd5ab766270edbb6ac43942a7ce6fc37847165af38008565c7cd188
-
- *
+ * ApiService dependency module
+ * <p/>
+ * <p/>
  * Created by K1 on 7/17/16.
  */
 @Module
@@ -40,7 +39,7 @@ public class AppModule {
         this.application = application;
 
         client = new OkHttpClient.Builder()
-                .addInterceptor(new CustomInterceptor())
+                .addInterceptor(new AuthorizationInterceptor())
                 .build();
 
         gson = new GsonBuilder().setDateFormat(DATA_FORMAT).create();
@@ -73,7 +72,7 @@ public class AppModule {
      * To Add Customized {@link retrofit2.http.Header} into {@link Request}
      * and then added inot {@link OkHttpClient}
      */
-    private static class CustomInterceptor implements Interceptor {
+    private static class AuthorizationInterceptor implements Interceptor {
         @Override
         public Response intercept(Chain chain) throws IOException {
             final Request original = chain.request();
@@ -84,17 +83,14 @@ public class AppModule {
             builder
                     .url(queryUrl)
                     .addHeader("Accept", "application/json")
-                    .addHeader("trakt-api-version", "2")
-//                  .addHeader("trakt-api-key", "ad005b8c117cdeee58a1bdb7089ea31386cd489b21e14b19818c91511f12a086")
-                    .addHeader("trakt-api-key", "e50771bf01afe4441d1b32d25c76d3c544de65cc449a16276ed4d05aff168168")
+                    .addHeader("trakt-api-version", Constants.API_VERSION)
+                    .addHeader("trakt-api-key", Constants.Client_ID)
                     .method(original.method(), original.body())
                     .build();
 
             return chain.proceed(builder.build());
         }
     }
-
-
 
 
 }
