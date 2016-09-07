@@ -33,17 +33,21 @@ import com.k1.trakttv.model.Token;
 import com.k1.trakttv.util.Constants;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
  * Main Activity of application to show some fragments and handle navigation between {@link MainActivityFragment}
- * <p>
+ * <p/>
  * Created by K1 on 7/17/16.
  */
 public class MainActivity extends AppCompatActivity implements OnMainCallback {
@@ -54,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements OnMainCallback {
     private static final String URL_COLUMN_NAME = "url";
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String[] columns = new String[]{ID_COLUMN_NAME, URL_COLUMN_NAME, TITLE_COLUMN_NAME};
-
 
     @Inject
     ApiService service;
@@ -218,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements OnMainCallback {
                 .append("&client_id=").append(Constants.Client_ID)
                 .append("&redirect_uri=").append(Constants.REDIRECT_URI)
                 .append("&state=").append(Constants.DEFAULT_STATE);
-        
+
         Log.i(TAG, " AUTHORIZE URL : " + buffer);
         CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
         builder.setShowTitle(true);
@@ -334,6 +337,10 @@ public class MainActivity extends AppCompatActivity implements OnMainCallback {
         }
     }
 
+    /**
+     * When {@link Token} received form web service
+     * You can move toward
+     */
     private class TokenCallback implements Callback<Token> {
         @Override
         public void onResponse(Call<Token> call, Response<Token> response) {
@@ -348,6 +355,35 @@ public class MainActivity extends AppCompatActivity implements OnMainCallback {
                 Toast.makeText(MainActivity.this, "Your registration Succeeded : "
                                 + response.body()
                         , Toast.LENGTH_SHORT).show();
+                SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
+                final String dateFormatted = format.format(new Date());
+                service.getMyShowsNews(dateFormatted, 7, response.body().getAccessToken())
+                        .enqueue(new Callback<ResponseBody>() {
+                            @Override
+                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                Log.d(TAG, "onResponse() called with: " + "call = [" + call + "], response = [" + response + "]");
+                                if (response.isSuccessful()) {
+                                    try {
+                                        Toast.makeText(MainActivity.this, response.body().string(), Toast.LENGTH_SHORT).show();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                } else {
+                                    try {
+                                        Toast.makeText(MainActivity.this,
+                                                response.errorBody().string()
+                                                , Toast.LENGTH_SHORT).show();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                t.printStackTrace();
+                            }
+                        });
 
             } else {
                 try {

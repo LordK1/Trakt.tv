@@ -12,6 +12,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -86,7 +87,7 @@ public interface ApiService {
      * "client_secret": "d6ea27703957b69939b8104ed4524595e210cd2e79af587744a7eb6e58f5b3d2",
      * "redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
      * "grant_type": "authorization_code"}
-     * <p>
+     * <p/>
      * POST https://api.trakt.tv/oauth/token
      *
      * @return
@@ -101,6 +102,25 @@ public interface ApiService {
      * @return
      */
     @GET("/calendars/my/shows/{date}/{count}")
-    Call<ResponseBody> getMyShows(@Path("date") String dateString, @Path("count") int count);
+    Call<ResponseBody> getMyShows(@Path("date") String dateString,
+                                  @Path("count") int count,
+                                  @Header("Authorization") String token);
+
+    /**
+     * GET https://api.trakt.tv/calendars/my/shows/new/2014-09-01/7
+     *
+     * @return
+     */
+    @GET("calendars/my/shows/new/{date}/{count}")
+    Call<ResponseBody> getMyShowsNews(@Path("date") String dateString,
+                                      @Path("count") int count,
+                                      @Header("Authorization") String token);
+
+    @POST("/checkin")
+    Call<ResponseBody> getChecking(@Body JsonObject object);
+
+    @GET("recommendations/shows")
+    Call<ResponseBody> getRecommendations(@Body JsonObject object);
+
 
 }
