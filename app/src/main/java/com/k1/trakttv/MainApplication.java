@@ -5,9 +5,12 @@ import android.content.res.Configuration;
 import android.support.multidex.MultiDex;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.k1.trakttv.dependency.AppComponent;
 import com.k1.trakttv.dependency.AppModule;
 import com.k1.trakttv.dependency.DaggerAppComponent;
+
+import io.fabric.sdk.android.Fabric;
 
 
 /**
@@ -25,6 +28,7 @@ public class MainApplication extends Application {
         Log.d(TAG, "onCreate() called with: " + "");
         MultiDex.install(getApplicationContext());
         appComponent = DaggerAppComponent.builder().appModule(new AppModule(this)).build();
+        Fabric.with(this,new Crashlytics());
     }
 
     @Override

@@ -24,6 +24,20 @@ But after I was rejected in recruiting process I've decided to make it complete 
 - [AppCompat v24](https://developer.android.com/topic/libraries/support-library/features.html)
 - [DataBinding](https://developer.android.com/topic/libraries/data-binding/index.html)
 
+## Fabric and Crashlytics
+
+buildscript {
+  repositories {
+    maven { url 'https://maven.fabric.io/public' }
+  }
+
+  dependencies {
+    // The Fabric Gradle plugin uses an open ended version to react
+    // quickly to Android tooling updates
+    classpath 'io.fabric.tools:gradle:1.+'
+  }
+}
+
 ## Supported Device :
 I don't have much time to handle multi android version support, But I think it must be OK on Android 5+.
 As I tested on Nexus series it would be Ok and works as well as possible !
