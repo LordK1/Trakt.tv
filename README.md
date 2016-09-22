@@ -23,6 +23,7 @@ But after I was rejected in recruiting process I've decided to make it complete 
 - [RecyclerView,CardView](https://developer.android.com/training/material/lists-cards.html)
 - [AppCompat v24](https://developer.android.com/topic/libraries/support-library/features.html)
 - [DataBinding](https://developer.android.com/topic/libraries/data-binding/index.html)
+- [Crashlytics](https://fabric.io/home)
 
 ## Fabric and Crashlytics
 

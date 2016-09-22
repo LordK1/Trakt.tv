@@ -194,13 +194,14 @@ public class MainActivity extends AppCompatActivity implements OnMainCallback {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_search:
-                if (!(getSupportFragmentManager().findFragmentById(R.id.fragment_container) instanceof SearchResultFragment)) {
+                /*if (!(getSupportFragmentManager().findFragmentById(R.id.fragment_container) instanceof SearchResultFragment)) {
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, new SearchResultFragment(), SearchResultFragment.FRAGMENT_NAME)
                             .addToBackStack(SearchResultFragment.FRAGMENT_NAME)
                             .commit();
                     return true;
-                }
+                }*/
+                throw new NullPointerException();
             case R.id.action_login:
                 Log.i(TAG, "onOptionsItemSelected: clicked");
                 doSomeAuthorize();
